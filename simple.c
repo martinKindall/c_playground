@@ -13,12 +13,16 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/hash.h>
+#include <linux/jiffies.h>
+#include <asm/param.h>
 
 /* This function is called when the module is loaded. */
 static int simple_init(void)
 {
        printk(KERN_INFO "Loading Module\n");
-       printk(KERN_INFO "%llu∖n", GOLDEN_RATIO_PRIME);
+       printk(KERN_INFO "%llu", GOLDEN_RATIO_PRIME);
+       printk(KERN_INFO "%lu", jiffies);
+       printk(KERN_INFO "%d", HZ);
        printk(KERN_INFO "testing\n");       
        return 0;
 }
@@ -26,6 +30,7 @@ static int simple_init(void)
 /* This function is called when the module is removed. */
 static void simple_exit(void) {
 	printk(KERN_INFO "Removing Module\n");
+	printk(KERN_INFO "%lu", jiffies);
 }
 
 /* Macros for registering module entry and exit points. */
