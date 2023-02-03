@@ -12,6 +12,7 @@ int main(void) {
 
     char* args[MAX_LINE/2 + 1];
     char str[MAX_LINE];
+    char last_command[MAX_LINE] = {0};
     int should_run = 1;
     int pid;
 
@@ -20,6 +21,19 @@ int main(void) {
         fflush(stdout);
 
         fgets(str, MAX_LINE, stdin); 
+        str[strcspn(str, "\n")] = 0;   // trim newline
+
+        if (strcmp(str, "!!") == 0) {
+            if (last_command[0] != 0) {
+                sprintf(str, "%s", last_command);
+                printf("%s\n", last_command);
+            } else {
+                printf("No commands in history\n");
+                continue;
+            }
+        } else {
+            sprintf(last_command, "%s", str);
+        }
 
         parse(args, str);
 
@@ -43,8 +57,6 @@ int main(void) {
     too and we don't have to deal with freeing memory.
 */
 void parse(char* args[MAX_LINE/2 + 1], char str[MAX_LINE]) {
-
-    str[strcspn(str, "\n")] = 0;   // trim newline
 
     char* p = strtok(str, " ");  
 
