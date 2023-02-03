@@ -8,7 +8,7 @@ int main() {
     ssize_t n;
     char buf[SIZE];
 
-    int fd = open("./somedata.txt", O_RDONLY);
+    int fd = open("somedata.txt", O_RDONLY);
 
     while ((n= read(fd, buf, SIZE))>0) {
         printf("Chars read: %ld \n", n);

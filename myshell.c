@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 #define MAX_LINE 80
 
@@ -40,7 +41,21 @@ int main(void) {
         pid = fork();
 
         if (pid == 0) {
+            int fd = -1;
+            if (args[1] != NULL && strcmp(args[1], "<") == 0) {
+                fd = open(args[2], O_RDONLY);
+                close(0);
+                dup(fd);
+                args[1] = args[2] = NULL;
+            } else if (args[1] != NULL && strcmp(args[1], ">") == 0) {
+                fd = open(args[2], O_WRONLY);
+                close(1);
+                dup(fd);
+                args[1] = args[2] = NULL;
+            }
             execvp(args[0], args);
+
+            if (fd != -1) close(fd);
         } else {
             wait(NULL);
         }
