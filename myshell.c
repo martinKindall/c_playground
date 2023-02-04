@@ -18,7 +18,7 @@ int main(void) {
     int pid;
 
     while (should_run) {
-        printf("morsa>");
+        printf("código morsa 🐶> ");
         fflush(stdout);
 
         fgets(str, MAX_LINE, stdin); 
