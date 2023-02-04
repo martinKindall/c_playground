@@ -7,7 +7,7 @@
 
 #define MAX_LINE 80
 
-void parse(char* args[MAX_LINE/2 + 1], char str[MAX_LINE]);
+int parse(char* args[MAX_LINE/2 + 1], char str[MAX_LINE]);
 
 int main(void) {
 
@@ -32,30 +32,55 @@ int main(void) {
                 printf("No commands in history\n");
                 continue;
             }
-        } else {
+        } else if (strcmp(str, "") != 0) {
             sprintf(last_command, "%s", str);
         }
 
-        parse(args, str);
+        int n_spaces = parse(args, str);
 
         pid = fork();
 
         if (pid == 0) {
             int fd = -1;
-            if (args[1] != NULL && strcmp(args[1], "<") == 0) {
-                fd = open(args[2], O_RDONLY);
+            if (n_spaces > 2 && strcmp(args[n_spaces-2], "<") == 0) {
+                fd = open(args[n_spaces-1], O_RDONLY);
                 close(0);
                 dup(fd);
-                args[1] = args[2] = NULL;
-            } else if (args[1] != NULL && strcmp(args[1], ">") == 0) {
-                fd = open(args[2], O_WRONLY);
+                args[n_spaces-2] = args[n_spaces-1] = NULL;
+            } else if (n_spaces > 2 && strcmp(args[n_spaces-2], ">") == 0) {
+                fd = open(args[n_spaces-1], O_WRONLY | O_CREAT, 0666);
                 close(1);
                 dup(fd);
-                args[1] = args[2] = NULL;
+                args[n_spaces-2] = args[n_spaces-1] = NULL;
+            } else if (n_spaces > 2 && strcmp(args[n_spaces-2], "|") == 0) {
+                int p[2];
+                pipe(p);
+
+                char* childCommand = args[n_spaces-1];
+                char* nestArgs[2] = {childCommand, NULL};
+                if (fork() == 0) {
+                    close(0);
+                    dup(p[0]);
+                    close(p[1]);
+                    execvp(childCommand, nestArgs);
+                    close(p[0]);
+                } else {
+                    close(1);
+                    dup(p[1]);
+                    close(p[0]);
+                    args[n_spaces-2] = args[n_spaces-1] = NULL;
+                    execvp(args[0], args);
+                    close(p[1]);
+                    wait(NULL);
+                }
+
+                return 0;
             }
+
             execvp(args[0], args);
 
             if (fd != -1) close(fd);
+            return 0;
         } else {
             wait(NULL);
         }
@@ -71,7 +96,7 @@ int main(void) {
     One way to solve that is using malloc, but this way works 
     too and we don't have to deal with freeing memory.
 */
-void parse(char* args[MAX_LINE/2 + 1], char str[MAX_LINE]) {
+int parse(char* args[MAX_LINE/2 + 1], char str[MAX_LINE]) {
 
     char* p = strtok(str, " ");  
 
@@ -84,4 +109,6 @@ void parse(char* args[MAX_LINE/2 + 1], char str[MAX_LINE]) {
     }
 
     args[n_spaces] = NULL;   // end of array
+
+    return n_spaces;
 }
