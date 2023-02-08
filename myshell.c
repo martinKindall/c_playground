@@ -6,6 +6,8 @@
 #include <fcntl.h>
 
 #define MAX_LINE 80
+#define YEL   "\x1B[33m"
+#define RESET "\x1B[0m"
 
 int parse(char* args[MAX_LINE/2 + 1], char str[MAX_LINE]);
 
@@ -18,7 +20,7 @@ int main(void) {
     int pid;
 
     while (should_run) {
-        printf("código morsa 🐶> ");
+        printf(YEL "código morsa > " RESET);
         fflush(stdout);
 
         fgets(str, MAX_LINE, stdin); 
