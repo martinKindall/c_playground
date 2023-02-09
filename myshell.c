@@ -34,6 +34,8 @@ int main(void) {
                 printf("No commands in history\n");
                 continue;
             }
+        } else if (strcmp(str, "exit") == 0) {
+            exit(0);
         } else if (strcmp(str, "") != 0) {
             sprintf(last_command, "%s", str);
         }
