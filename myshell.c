@@ -78,13 +78,14 @@ int main(void) {
                     wait(NULL);
                 }
 
-                return 0;
+                printf("Command '%s' failed\n", args[0]);
+                exit(1);
             }
 
             execvp(args[0], args);
-
             if (fd != -1) close(fd);
-            return 0;
+            printf("Command '%s' failed\n", args[0]);
+            exit(1);
         } else {
             wait(NULL);
         }
