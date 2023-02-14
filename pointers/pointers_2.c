@@ -23,10 +23,10 @@ int main() {
     return 0;
 }
 
-
 void somefunction(void* something) {
     printf("Size of something: %ld\n", sizeof(something));
     printf("Size of something 2: %ld\n", sizeof((char*)something));
+    printf("Size of something 3: %ld\n", sizeof(*(char*)something));
     printf("Content char pointer: %c\n", *(char*)something);
     printf("Content char pointer 2: %c\n", *((char*)something + 1));
 }
